@@ -1,0 +1,129 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "1ee30077-6e5f-4002-974e-f011d5c33a48",
+  "position": {
+    "x": 20,
+    "y": 280,
+    "z": 0,
+    "width": 1240,
+    "height": 300,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RiskSummary"
+                    }
+                  },
+                  "Property": "model_name"
+                }
+              },
+              "queryRef": "RiskSummary.model_name",
+              "nativeQueryRef": "model_name"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RiskSummary"
+                    }
+                  },
+                  "Property": "precision"
+                }
+              },
+              "queryRef": "RiskSummary.precision",
+              "nativeQueryRef": "precision"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RiskSummary"
+                    }
+                  },
+                  "Property": "recall"
+                }
+              },
+              "queryRef": "RiskSummary.recall",
+              "nativeQueryRef": "recall"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RiskSummary"
+                    }
+                  },
+                  "Property": "f1"
+                }
+              },
+              "queryRef": "RiskSummary.f1",
+              "nativeQueryRef": "f1"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RiskSummary"
+                    }
+                  },
+                  "Property": "roc_auc"
+                }
+              },
+              "queryRef": "RiskSummary.roc_auc",
+              "nativeQueryRef": "roc_auc"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RiskSummary"
+                    }
+                  },
+                  "Property": "threshold"
+                }
+              },
+              "queryRef": "RiskSummary.threshold",
+              "nativeQueryRef": "threshold"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Detection Performance Detail'"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "04bb0745-69bd-4e6b-946d-4e2dca9eb948",
+  "position": {
+    "x": 20,
+    "y": 120,
+    "z": 0,
+    "width": 220,
+    "height": 120,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RiskSummary"
+                    }
+                  },
+                  "Property": "Model Precision"
+                }
+              },
+              "queryRef": "RiskSummary.Model Precision",
+              "nativeQueryRef": "Model Precision"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Model Precision'"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -5,7 +5,29 @@
       "name": "CY24SU06",
       "reportVersionAtImport": "5.55",
       "type": "SharedResources"
+    },
+    "customTheme": {
+      "name": "FraudPatternTheme.json",
+      "reportVersionAtImport": {
+        "visual": "2.1.0",
+        "report": "3.0.0",
+        "page": "2.0.0"
+      },
+      "type": "RegisteredResources"
     }
   },
+  "resourcePackages": [
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "FraudPatternTheme.json",
+          "path": "FraudPatternTheme.json",
+          "type": "CustomTheme"
+        }
+      ]
+    }
+  ],
   "layoutOptimization": "None"
 }

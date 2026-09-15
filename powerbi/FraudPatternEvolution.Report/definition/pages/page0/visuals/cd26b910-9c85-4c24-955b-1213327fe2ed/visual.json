@@ -1,0 +1,59 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "cd26b910-9c85-4c24-955b-1213327fe2ed",
+  "position": {
+    "x": 740,
+    "y": 120,
+    "z": 0,
+    "width": 220,
+    "height": 120,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RiskSummary"
+                    }
+                  },
+                  "Property": "Model ROC AUC"
+                }
+              },
+              "queryRef": "RiskSummary.Model ROC AUC",
+              "nativeQueryRef": "Model ROC AUC"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Model ROC AUC'"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

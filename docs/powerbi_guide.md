@@ -3,22 +3,23 @@
 ## Status — read this first
 
 A real `.pbip` project exists at `powerbi/FraudPatternEvolution.pbip`. Real and complete: 3
-tables, all 9 DAX measures below (0 relationships — deliberate, see below), and **15 real visual
-objects across all 4 pages** (see [Visual inventory](#visual-inventory)) — every one binds to an
-actual table/column/measure. Page 3's ideal content (a confusion matrix) still needs a new SQL
-view (no `powerbi_*` view currently exposes true/false positive/negative counts, only aggregate
-metrics) — not yet added; page 3 uses the real aggregate metrics instead, do not approximate a
-confusion matrix from precision/recall in DAX.
+tables, all 9 DAX measures below (0 relationships — deliberate, see below), **22 real visual
+objects across all 4 pages** (18 data visuals + a header/footer text box per page — see
+[Visual inventory](#visual-inventory)), a custom theme (`FraudPatternTheme.json`, wired into
+`report.json`), and accent colors on the risk-indicator visuals (see Design system). Page 3's
+ideal content (a confusion matrix) still needs a new SQL view (no `powerbi_*` view currently
+exposes true/false positive/negative counts, only aggregate metrics) — not yet added; page 3 uses
+the real aggregate metrics instead, do not approximate a confusion matrix from precision/recall
+in DAX.
 
-**Power BI Desktop validation status: NOT VERIFIED.** This project's sibling (Climate Risk) was
-confirmed *openable* by Power BI Desktop in one clean, safe test — full authoring ribbon, "Loading
-report" state. A second validation attempt on that file captured unrelated content from another
-window on this live desktop instead (a focus-tracking failure, not a Power BI issue) — deleted
-immediately, never committed — and after that second incident, further screenshot-based validation
-was stopped entirely, before reaching this repo specifically. The outer project structure follows
-the same pattern already confirmed acceptable; **the visual JSON below was authored to the best
-available knowledge of the PBIR schema but was never itself opened in Power BI Desktop.** If you
-open this file and something doesn't render, that's real information.
+**Power BI Desktop validation status: PARTIALLY VERIFIED, via the sibling Climate Risk project.**
+The project owner actually opened `ClimateRisk.pbip` and reported real bugs (blank charts, no
+titles, a literal `\$`, wrong date format, maps disabled for their tenant) — root causes found and
+fixed identically across all 4 projects, this one included (full diagnostic account in Climate's
+`docs/powerbi_guide.md`). **This project's own file has not been independently reopened** — its
+fixes and this round's styling are structurally validated (every field/measure reference checked
+against the live model, no overlaps, no blank pages) but not yet confirmed by an actual render.
+If you open this file and something doesn't render correctly, that's real information — say so.
 
 ## Data connectivity
 
@@ -47,11 +48,23 @@ Avg Cluster Size = AVERAGE(powerbi_network_summary[component_size])
 Precision/Recall/ROC-AUC are single-model-run outputs already computed in Python/scikit-learn
 against real ground truth — expose as cards, never recompute a classification metric in DAX.
 
-## Design system
+## Design system — now actually applied, not just documented
 
-Base: near-white `#F7F8FA` background, Segoe UI. This project's accents: primary navy `#14213D`,
-secondary teal `#2E8B99`, warning amber `#E8A33D` (suspicious), critical red `#C0392B`
-(confirmed/high-risk), neutral gray `#94A3B8` (normal transactions).
+Segoe UI. Accents: primary navy `#14213D`, secondary teal `#2E8B99`, warning amber `#E8A33D`
+(suspicious), critical red `#C0392B` (confirmed/high-risk), neutral gray `#94A3B8` (normal
+transactions).
+
+**Background**: a pale navy-tinted canvas `#ECEFF5` behind white visual containers — same
+reasoning as Climate's (see that project's guide for the 3 options weighed).
+
+**Per-visual accent colors** (`dataPoint.defaultColor`, single-measure charts only): Fraud Rate
+Over Time → critical red. Avg Cluster Size by Home Country → warning amber (suspicious-activity
+indicator). Flagged Transactions card → warning amber; True Fraud Rate and True Fraud
+Transactions cards → critical red. Transaction Volume vs. Fraud Volume (2 series) is left
+theme-driven, per Microsoft's own caution against flattening a multi-series chart to one color.
+
+**Header/footer**: every page gets a themed header and footer as real `textbox` visuals,
+including a synthetic-data disclosure in the header badge.
 
 ## Visual inventory
 

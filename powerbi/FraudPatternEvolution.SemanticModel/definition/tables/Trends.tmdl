@@ -1,9 +1,9 @@
 table Trends
-	lineageTag: 8e7f45f8-a858-408c-8298-9d6a29fa98b3
+	lineageTag: 867ad5da-eb5c-4eed-8d5b-870172e9ab6e
 
 	column month
 		dataType: dateTime
-		lineageTag: ce92803a-7a67-4427-ad88-62488f926fbb
+		lineageTag: a555d849-c125-4081-bb2c-cc2e20f5307f
 		summarizeBy: none
 		formatString: yyyy-MM
 		sourceColumn: month
@@ -12,7 +12,7 @@ table Trends
 
 	column total_transactions
 		dataType: int64
-		lineageTag: 47602f32-1a86-4452-9691-634a2e8f9730
+		lineageTag: becac7e8-ef15-4033-8a30-7f0e08f4dfad
 		summarizeBy: none
 		formatString: #,0
 		sourceColumn: total_transactions
@@ -21,7 +21,7 @@ table Trends
 
 	column fraud_transactions
 		dataType: int64
-		lineageTag: f38d2510-cac1-454f-b11a-736f6a2c59fe
+		lineageTag: 5e1c92c4-7cff-4ac4-8a70-ca5cdfc3c08b
 		summarizeBy: none
 		formatString: #,0
 		sourceColumn: fraud_transactions
@@ -30,7 +30,7 @@ table Trends
 
 	column fraud_rate
 		dataType: double
-		lineageTag: a0043270-9171-4613-bbfd-f8c0abfbf068
+		lineageTag: 888327d3-00ab-4c2a-ad10-f239c8687de3
 		summarizeBy: none
 		formatString: 0.00%
 		sourceColumn: fraud_rate
@@ -39,7 +39,7 @@ table Trends
 
 	column total_amount
 		dataType: decimal
-		lineageTag: 85568f86-c12b-4038-aa9b-76d4a4712968
+		lineageTag: ce57398e-85e8-4dad-bddd-a79eeb433b81
 		summarizeBy: none
 		formatString: "$"#,0
 		sourceColumn: total_amount
@@ -48,7 +48,7 @@ table Trends
 
 	column fraud_amount
 		dataType: decimal
-		lineageTag: c136a624-fc88-43d6-b8b7-011525d6b1a0
+		lineageTag: a34c3a9c-6df1-4f52-be18-6404fbb4909b
 		summarizeBy: none
 		formatString: "$"#,0
 		sourceColumn: fraud_amount

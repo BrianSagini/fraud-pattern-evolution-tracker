@@ -1,0 +1,157 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "9a2c965e-f8e6-44f3-be1c-579784afc25c",
+  "position": {
+    "x": 660,
+    "y": 120,
+    "z": 0,
+    "width": 600,
+    "height": 300,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "NetworkSummary"
+                    }
+                  },
+                  "Property": "account_id"
+                }
+              },
+              "queryRef": "NetworkSummary.account_id",
+              "nativeQueryRef": "account_id"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "NetworkSummary"
+                    }
+                  },
+                  "Property": "account_type"
+                }
+              },
+              "queryRef": "NetworkSummary.account_type",
+              "nativeQueryRef": "account_type"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "NetworkSummary"
+                    }
+                  },
+                  "Property": "home_country"
+                }
+              },
+              "queryRef": "NetworkSummary.home_country",
+              "nativeQueryRef": "home_country"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "NetworkSummary"
+                    }
+                  },
+                  "Property": "component_id"
+                }
+              },
+              "queryRef": "NetworkSummary.component_id",
+              "nativeQueryRef": "component_id"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "NetworkSummary"
+                    }
+                  },
+                  "Property": "component_size"
+                }
+              },
+              "queryRef": "NetworkSummary.component_size",
+              "nativeQueryRef": "component_size"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "NetworkSummary"
+                    }
+                  },
+                  "Property": "degree"
+                }
+              },
+              "queryRef": "NetworkSummary.degree",
+              "nativeQueryRef": "degree"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "NetworkSummary"
+                    }
+                  },
+                  "Property": "is_ring_candidate"
+                }
+              },
+              "queryRef": "NetworkSummary.is_ring_candidate",
+              "nativeQueryRef": "is_ring_candidate"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "NetworkSummary"
+                    }
+                  },
+                  "Property": "is_fraud_ring_member"
+                }
+              },
+              "queryRef": "NetworkSummary.is_fraud_ring_member",
+              "nativeQueryRef": "is_fraud_ring_member"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Ring-Candidate Accounts'"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

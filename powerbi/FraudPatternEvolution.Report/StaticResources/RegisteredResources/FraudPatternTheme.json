@@ -1,0 +1,68 @@
+{
+  "name": "FraudPatternTheme",
+  "dataColors": [
+    "#14213D",
+    "#2E8B99",
+    "#E8A33D",
+    "#C0392B",
+    "#94A3B8",
+    "#3B82C4",
+    "#7C93B0",
+    "#0F1830"
+  ],
+  "good": "#2E9E5B",
+  "neutral": "#94A3B8",
+  "bad": "#C0392B",
+  "foreground": "#1A1A2E",
+  "background": "#FFFFFF",
+  "tableAccent": "#14213D",
+  "textClasses": {
+    "label": {
+      "fontSize": 10,
+      "fontFace": "Segoe UI",
+      "color": "#1A1A2E"
+    },
+    "title": {
+      "fontSize": 12,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#1A1A2E"
+    },
+    "header": {
+      "fontSize": 12,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#14213D"
+    },
+    "callout": {
+      "fontSize": 32,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#14213D"
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "transparency": 0
+          }
+        ],
+        "outspace": [
+          {
+            "color": {
+              "solid": {
+                "color": "#ECEFF5"
+              }
+            },
+            "transparency": 0
+          }
+        ]
+      }
+    }
+  }
+}
