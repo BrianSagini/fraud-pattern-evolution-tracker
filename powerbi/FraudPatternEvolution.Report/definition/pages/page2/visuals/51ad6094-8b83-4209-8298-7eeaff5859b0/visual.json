@@ -1,8 +1,8 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
-  "name": "9e0625cb-0a20-4225-85c0-20c5e3082c41",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "51ad6094-8b83-4209-8298-7eeaff5859b0",
   "position": {
-    "x": 260,
+    "x": 740,
     "y": 60,
     "z": 0,
     "width": 220,
@@ -23,24 +23,24 @@
                       "Entity": "RiskSummary"
                     }
                   },
-                  "Property": "Model Recall"
+                  "Property": "True Fraud Transactions"
                 }
               },
-              "queryRef": "RiskSummary.Model Recall",
-              "nativeQueryRef": "Model Recall"
+              "queryRef": "RiskSummary.True Fraud Transactions",
+              "nativeQueryRef": "True Fraud Transactions"
             }
           ]
         }
       }
     },
-    "objects": {
+    "visualContainerObjects": {
       "title": [
         {
           "properties": {
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Model Recall'"
+                  "Value": "'True Fraud Transactions'"
                 }
               }
             },

@@ -1,9 +1,9 @@
 table NetworkSummary
-	lineageTag: 99d36c0c-ab02-4007-bba7-da6976103e12
+	lineageTag: 220168b6-7d8c-42ba-b90b-3f52933f4fc6
 
 	column account_id
 		dataType: string
-		lineageTag: 148efbdc-98a6-4daa-add3-3d6122c9a577
+		lineageTag: dad0d1a2-8625-44d5-8b71-dd4e79cc9432
 		summarizeBy: none
 		sourceColumn: account_id
 
@@ -11,7 +11,7 @@ table NetworkSummary
 
 	column account_type
 		dataType: string
-		lineageTag: d613ab0a-e3c1-4367-bff8-f90ae7bc6332
+		lineageTag: f528ce95-8f5f-424f-884c-dd112b2cddaf
 		summarizeBy: none
 		sourceColumn: account_type
 
@@ -19,7 +19,7 @@ table NetworkSummary
 
 	column home_country
 		dataType: string
-		lineageTag: 6c429a34-186a-4629-add0-40a7502008e2
+		lineageTag: 91f76567-d4bf-43a5-96c1-9a351da2cfd2
 		summarizeBy: none
 		sourceColumn: home_country
 
@@ -27,7 +27,7 @@ table NetworkSummary
 
 	column is_fraud_ring_member
 		dataType: boolean
-		lineageTag: eb16cb20-6b72-4e31-8250-2c41a9e0fc65
+		lineageTag: dc858202-b6a9-4354-a468-c5b592af217a
 		summarizeBy: none
 		sourceColumn: is_fraud_ring_member
 
@@ -35,7 +35,7 @@ table NetworkSummary
 
 	column ring_id
 		dataType: string
-		lineageTag: 5bdf55b1-9d89-49e2-92a2-3999ccb04259
+		lineageTag: 67d6af13-89c3-4411-90e3-22a524787346
 		summarizeBy: none
 		sourceColumn: ring_id
 
@@ -43,7 +43,7 @@ table NetworkSummary
 
 	column component_id
 		dataType: int64
-		lineageTag: 095575ca-267b-464c-ba7e-b2de8aa55cd7
+		lineageTag: 27287be0-4476-42f2-b602-0b7b3238fec8
 		summarizeBy: none
 		formatString: 0
 		sourceColumn: component_id
@@ -52,7 +52,7 @@ table NetworkSummary
 
 	column component_size
 		dataType: int64
-		lineageTag: d446f745-2ad4-45b2-a604-85625466c6ad
+		lineageTag: 6fcb6f44-d044-4411-ba16-45bbd082c09f
 		summarizeBy: none
 		formatString: 0
 		sourceColumn: component_size
@@ -61,7 +61,7 @@ table NetworkSummary
 
 	column degree
 		dataType: int64
-		lineageTag: 6242fc9c-0c66-40a0-a94b-54a3cc5098b5
+		lineageTag: ba1d1eff-b220-4e61-838b-d30c3150889f
 		summarizeBy: none
 		formatString: 0
 		sourceColumn: degree
@@ -70,7 +70,7 @@ table NetworkSummary
 
 	column is_ring_candidate
 		dataType: boolean
-		lineageTag: e5a39cc4-0c10-44eb-8a72-1219032c2e49
+		lineageTag: f974d06d-6a46-405f-97bf-b27e861c5255
 		summarizeBy: none
 		sourceColumn: is_ring_candidate
 
@@ -78,11 +78,11 @@ table NetworkSummary
 
 	measure 'Ring Candidate Accounts' = CALCULATE(DISTINCTCOUNT(NetworkSummary[account_id]), NetworkSummary[is_ring_candidate] = TRUE)
 		formatString: #,0
-		lineageTag: 1345ebc1-f664-4f03-90cf-c35ae3a7b636
+		lineageTag: 351beb89-97a7-45a5-87ff-b687593ffe63
 
 	measure 'Avg Cluster Size' = AVERAGE(NetworkSummary[component_size])
 		formatString: 0.0
-		lineageTag: 43534d48-7840-453a-8699-3214cca530c2
+		lineageTag: f63d04bb-1671-42a5-b6f2-0c8f3824f2ac
 
 	partition NetworkSummary = m
 		mode: import

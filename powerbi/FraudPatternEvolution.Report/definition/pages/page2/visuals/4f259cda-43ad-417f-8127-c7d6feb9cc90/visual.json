@@ -1,6 +1,6 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
-  "name": "461f18c9-2bbb-4e0c-95fb-94bf09d5a013",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "4f259cda-43ad-417f-8127-c7d6feb9cc90",
   "position": {
     "x": 20,
     "y": 60,
@@ -33,7 +33,7 @@
         }
       }
     },
-    "objects": {
+    "visualContainerObjects": {
       "title": [
         {
           "properties": {

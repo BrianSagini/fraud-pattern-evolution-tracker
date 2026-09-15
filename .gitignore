@@ -19,7 +19,7 @@ data_raw/*
 # Power BI: .pbip projects (TMDL/PBIR) are text and committed; these are
 # per-machine local cache/credential artifacts Power BI Desktop generates
 # next to them and must never be committed.
-**/.pbi/localSettings.json
+**/.pbi/
 **/*.pbix
 **/CachedData/
 **/*.abf

@@ -1,8 +1,8 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
-  "name": "52ad6cb5-357f-4acf-bf9d-6a78678aff07",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "67e69862-862a-4918-8a03-38fcb675493b",
   "position": {
-    "x": 740,
+    "x": 20,
     "y": 60,
     "z": 0,
     "width": 220,
@@ -23,24 +23,24 @@
                       "Entity": "RiskSummary"
                     }
                   },
-                  "Property": "Model ROC AUC"
+                  "Property": "Total Transactions"
                 }
               },
-              "queryRef": "RiskSummary.Model ROC AUC",
-              "nativeQueryRef": "Model ROC AUC"
+              "queryRef": "RiskSummary.Total Transactions",
+              "nativeQueryRef": "Total Transactions"
             }
           ]
         }
       }
     },
-    "objects": {
+    "visualContainerObjects": {
       "title": [
         {
           "properties": {
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Model ROC AUC'"
+                  "Value": "'Total Transactions'"
                 }
               }
             },

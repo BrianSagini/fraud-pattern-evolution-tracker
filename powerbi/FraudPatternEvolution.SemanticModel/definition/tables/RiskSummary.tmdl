@@ -1,9 +1,9 @@
 table RiskSummary
-	lineageTag: 2ecb1603-db13-4a92-9aa3-da971cfd8812
+	lineageTag: f63d3b6f-95c9-4ce7-a0f2-5a4304fa6473
 
 	column total_transactions
 		dataType: int64
-		lineageTag: 897c31ab-335e-47bd-9e7d-b5997c9f00e1
+		lineageTag: 5cf69056-5977-4b4c-89a7-e2b1b192383e
 		summarizeBy: none
 		formatString: #,0
 		sourceColumn: total_transactions
@@ -12,7 +12,7 @@ table RiskSummary
 
 	column flagged_transactions
 		dataType: int64
-		lineageTag: 5d194aa2-8a8e-43c4-ac66-68d70ae92b43
+		lineageTag: 48d107d5-d382-47af-941e-6209778026a2
 		summarizeBy: none
 		formatString: #,0
 		sourceColumn: flagged_transactions
@@ -21,7 +21,7 @@ table RiskSummary
 
 	column true_fraud_transactions
 		dataType: int64
-		lineageTag: 6327cf6c-1aea-48cc-b3eb-b76feb10e7e0
+		lineageTag: 5b46a6fc-cb39-4d7a-a6b2-a65393b22f7b
 		summarizeBy: none
 		formatString: #,0
 		sourceColumn: true_fraud_transactions
@@ -30,16 +30,16 @@ table RiskSummary
 
 	column true_fraud_amount
 		dataType: decimal
-		lineageTag: f26dd046-64bc-4d32-84c7-221db19efbe7
+		lineageTag: 5463b25b-0a28-4016-baf6-6f854b53713d
 		summarizeBy: none
-		formatString: "\$"#,0
+		formatString: "$"#,0
 		sourceColumn: true_fraud_amount
 
 		annotation SummarizationSetBy = Automatic
 
 	column true_fraud_rate
 		dataType: decimal
-		lineageTag: 9812d520-0cdc-45e1-985b-e7702e4ec4c4
+		lineageTag: 3f2e1655-ccfb-4f4a-9991-3c540a473296
 		summarizeBy: none
 		formatString: 0.00%
 		sourceColumn: true_fraud_rate
@@ -48,7 +48,7 @@ table RiskSummary
 
 	column model_name
 		dataType: string
-		lineageTag: e474587b-54ca-4a91-a2e9-5b3db81d8d0d
+		lineageTag: f17bcd33-ff43-4328-9975-5999e56f2bcf
 		summarizeBy: none
 		sourceColumn: model_name
 
@@ -56,7 +56,7 @@ table RiskSummary
 
 	column precision
 		dataType: double
-		lineageTag: 0c13c329-f802-42e5-9d46-c994c11a2108
+		lineageTag: cd936e07-b01a-4451-b72c-0a49242a0052
 		summarizeBy: none
 		formatString: 0.00%
 		sourceColumn: precision
@@ -65,7 +65,7 @@ table RiskSummary
 
 	column recall
 		dataType: double
-		lineageTag: f2673b82-897e-4f6b-9dfb-1838bcbd4a0f
+		lineageTag: 767354ec-dbaf-4d7f-8e2a-5e4e2bd28456
 		summarizeBy: none
 		formatString: 0.00%
 		sourceColumn: recall
@@ -74,7 +74,7 @@ table RiskSummary
 
 	column f1
 		dataType: double
-		lineageTag: d80429b4-c63f-4346-855e-9d36850ae196
+		lineageTag: 00b695b6-e0c2-4bc0-b056-e3957b2667c7
 		summarizeBy: none
 		formatString: 0.000
 		sourceColumn: f1
@@ -83,7 +83,7 @@ table RiskSummary
 
 	column roc_auc
 		dataType: double
-		lineageTag: 0bd8476c-a0f7-49a3-8076-2a6f6d828eb7
+		lineageTag: a8fee474-4bbd-44f5-959e-76fd4e916542
 		summarizeBy: none
 		formatString: 0.000
 		sourceColumn: roc_auc
@@ -92,7 +92,7 @@ table RiskSummary
 
 	column threshold
 		dataType: double
-		lineageTag: e74978d2-f34b-402f-835e-e9232f26db1c
+		lineageTag: 24aa89d0-b680-4fd8-8694-3aea34f7ff76
 		summarizeBy: none
 		formatString: 0.00
 		sourceColumn: threshold
@@ -101,31 +101,31 @@ table RiskSummary
 
 	measure 'Total Transactions' = SUM(RiskSummary[total_transactions])
 		formatString: #,0
-		lineageTag: 45b1278c-df45-4aca-be1b-4972358aca8b
+		lineageTag: ff546934-aba0-4d86-b1f9-b62236f91399
 
 	measure 'Flagged Transactions' = SUM(RiskSummary[flagged_transactions])
 		formatString: #,0
-		lineageTag: c040b9c5-3416-478a-9131-3802635a47e6
+		lineageTag: e705b231-5c27-4939-b4a1-0d1efdd38999
 
 	measure 'True Fraud Transactions' = SUM(RiskSummary[true_fraud_transactions])
 		formatString: #,0
-		lineageTag: 17d2469c-de6b-4570-8e6f-d9e555f958ce
+		lineageTag: 0c202471-70e3-4f02-9e6a-4a627f8a6ea3
 
 	measure 'True Fraud Rate' = AVERAGE(RiskSummary[true_fraud_rate])
 		formatString: 0.00%
-		lineageTag: dbab1ce6-d597-4780-90de-19928cd292dc
+		lineageTag: eb0be077-bbc6-40df-85ca-e6b7d77bcde2
 
 	measure 'Model Precision' = AVERAGE(RiskSummary[precision])
 		formatString: 0.00%
-		lineageTag: b839c743-a6b4-4108-8253-c1377352ae78
+		lineageTag: bf6a6605-c79f-4a57-aab9-0262e6ad4fb4
 
 	measure 'Model Recall' = AVERAGE(RiskSummary[recall])
 		formatString: 0.00%
-		lineageTag: 9f14dd03-f21f-41b7-bf1f-5d657a986439
+		lineageTag: 0741a2fa-8ec4-4d96-aa79-9cfd74f13727
 
 	measure 'Model ROC AUC' = AVERAGE(RiskSummary[roc_auc])
 		formatString: 0.000
-		lineageTag: 8bc8a77c-9e75-47ab-857c-ad9350155601
+		lineageTag: 345fb436-7663-407e-94af-26d95b76914e
 
 	partition RiskSummary = m
 		mode: import

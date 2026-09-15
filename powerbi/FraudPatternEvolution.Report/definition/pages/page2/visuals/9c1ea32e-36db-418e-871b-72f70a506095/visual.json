@@ -1,8 +1,8 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
-  "name": "7a299474-0866-4fd7-a304-b01c52e0ea83",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "9c1ea32e-36db-418e-871b-72f70a506095",
   "position": {
-    "x": 740,
+    "x": 500,
     "y": 60,
     "z": 0,
     "width": 220,
@@ -23,24 +23,24 @@
                       "Entity": "RiskSummary"
                     }
                   },
-                  "Property": "True Fraud Transactions"
+                  "Property": "Model ROC AUC"
                 }
               },
-              "queryRef": "RiskSummary.True Fraud Transactions",
-              "nativeQueryRef": "True Fraud Transactions"
+              "queryRef": "RiskSummary.Model ROC AUC",
+              "nativeQueryRef": "Model ROC AUC"
             }
           ]
         }
       }
     },
-    "objects": {
+    "visualContainerObjects": {
       "title": [
         {
           "properties": {
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'True Fraud Transactions'"
+                  "Value": "'Model ROC AUC'"
                 }
               }
             },

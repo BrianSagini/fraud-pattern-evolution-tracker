@@ -1,16 +1,16 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
-  "name": "96169900-42f5-42d4-9414-84dff9b660bf",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "d6254c56-2b4c-4478-84f7-28a8f12e0a96",
   "position": {
     "x": 20,
-    "y": 400,
+    "y": 60,
     "z": 0,
     "width": 1000,
-    "height": 260,
+    "height": 320,
     "tabOrder": 0
   },
   "visual": {
-    "visualType": "clusteredColumnChart",
+    "visualType": "lineChart",
     "query": {
       "queryState": {
         "Category": {
@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "Trends.month",
-              "nativeQueryRef": "month"
+              "nativeQueryRef": "month",
+              "active": true
             }
           ]
         },
@@ -41,38 +42,52 @@
                       "Entity": "Trends"
                     }
                   },
-                  "Property": "total_amount"
+                  "Property": "fraud_rate"
                 }
               },
-              "queryRef": "Trends.total_amount",
-              "nativeQueryRef": "total_amount"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Trends"
-                    }
-                  },
-                  "Property": "fraud_amount"
-                }
-              },
-              "queryRef": "Trends.fraud_amount",
-              "nativeQueryRef": "fraud_amount"
+              "queryRef": "Trends.fraud_rate",
+              "nativeQueryRef": "fraud_rate"
             }
           ]
         }
       }
     },
     "objects": {
+      "categoryAxis": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "valueAxis": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
       "title": [
         {
           "properties": {
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Transaction Volume vs. Fraud Volume'"
+                  "Value": "'Fraud Rate Over Time'"
                 }
               }
             },

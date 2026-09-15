@@ -1,8 +1,8 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
-  "name": "e76713de-4976-41b0-81d1-c3cb76b7f024",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "15bdd65b-31a1-4171-a98f-81342574005d",
   "position": {
-    "x": 20,
+    "x": 500,
     "y": 60,
     "z": 0,
     "width": 220,
@@ -23,24 +23,24 @@
                       "Entity": "RiskSummary"
                     }
                   },
-                  "Property": "Total Transactions"
+                  "Property": "True Fraud Rate"
                 }
               },
-              "queryRef": "RiskSummary.Total Transactions",
-              "nativeQueryRef": "Total Transactions"
+              "queryRef": "RiskSummary.True Fraud Rate",
+              "nativeQueryRef": "True Fraud Rate"
             }
           ]
         }
       }
     },
-    "objects": {
+    "visualContainerObjects": {
       "title": [
         {
           "properties": {
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Total Transactions'"
+                  "Value": "'True Fraud Rate'"
                 }
               }
             },

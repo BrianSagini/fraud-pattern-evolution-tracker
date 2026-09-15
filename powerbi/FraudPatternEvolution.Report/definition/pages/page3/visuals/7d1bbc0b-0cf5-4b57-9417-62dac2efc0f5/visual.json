@@ -1,6 +1,6 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
-  "name": "6a904618-61bb-47e1-a9f6-160036de99d9",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "7d1bbc0b-0cf5-4b57-9417-62dac2efc0f5",
   "position": {
     "x": 20,
     "y": 60,
@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "NetworkSummary.home_country",
-              "nativeQueryRef": "home_country"
+              "nativeQueryRef": "home_country",
+              "active": true
             }
           ]
         },
@@ -52,6 +53,34 @@
       }
     },
     "objects": {
+      "categoryAxis": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "valueAxis": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
       "title": [
         {
           "properties": {

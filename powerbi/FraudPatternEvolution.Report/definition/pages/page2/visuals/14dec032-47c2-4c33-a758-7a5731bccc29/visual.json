@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
-  "name": "e3db14c5-4997-4eac-abfa-d9c514fe1c2b",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "14dec032-47c2-4c33-a758-7a5731bccc29",
   "position": {
     "x": 20,
     "y": 220,
     "z": 0,
     "width": 1240,
-    "height": 200,
+    "height": 300,
     "tabOrder": 0
   },
   "visual": {
@@ -103,14 +103,14 @@
         }
       }
     },
-    "objects": {
+    "visualContainerObjects": {
       "title": [
         {
           "properties": {
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Model Evaluation Summary'"
+                  "Value": "'Detection Performance Detail'"
                 }
               }
             },
