@@ -3,7 +3,7 @@
 ## Status — read this first
 
 A real `.pbip` project exists at `powerbi/FraudPatternEvolution.pbip`. Real and complete: 3
-tables, all 9 DAX measures below (0 relationships — deliberate, see below), and **14 real visual
+tables, all 9 DAX measures below (0 relationships — deliberate, see below), and **15 real visual
 objects across all 4 pages** (see [Visual inventory](#visual-inventory)) — every one binds to an
 actual table/column/measure. Page 3's ideal content (a confusion matrix) still needs a new SQL
 view (no `powerbi_*` view currently exposes true/false positive/negative counts, only aggregate
@@ -78,8 +78,9 @@ Every visual below is a real object in `powerbi/FraudPatternEvolution.Report/def
 **Page 4 — Pattern & Network Analysis**
 - Avg Cluster Size by Home Country — Clustered column chart — Category `NetworkSummary[home_country]`, Y `NetworkSummary[component_size]`
 - Ring-Candidate Accounts — Table — account id/type/country, cluster id/size/degree, ring-candidate and ground-truth flags — deliberately a table, not a fabricated network diagram (no reliable first-party force-directed graph visual exists)
+- Ring-Candidate Accounts by Country — Map — Category `NetworkSummary[home_country]` (geocoded by name, no lat/lon field exists on this table), Size `NetworkSummary[Ring Candidate Accounts]`
 
-**Total: 14 visuals across 4 pages.**
+**Total: 15 visuals across 4 pages.**
 
 State on every page that all transaction/account data is synthetic.
 

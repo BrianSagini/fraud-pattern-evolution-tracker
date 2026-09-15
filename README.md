@@ -58,7 +58,7 @@ bug; a real fraud-alert queue commonly runs at similar precision. Full detail:
 ## Power BI
 
 A real `.pbip` project (`powerbi/FraudPatternEvolution.pbip`) exists with the complete data model
-— 3 tables, 9 DAX measures — **and 14 real visuals across all 4 pages** (see
+— 3 tables, 9 DAX measures — **and 15 real visuals across all 4 pages** (see
 `docs/powerbi_guide.md`'s visual inventory; page 3's ideal confusion-matrix breakdown additionally
 needs a new SQL view, so it uses the real aggregate metrics instead for now). **Rendering is not
 verified**: the outer project structure was confirmed openable by Power BI Desktop in one safe
