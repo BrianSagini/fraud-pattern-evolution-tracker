@@ -1,0 +1,147 @@
+x-airflow-common:
+  &airflow-common
+  build:
+    context: ./airflow
+    dockerfile: Dockerfile
+  image: fraud-pattern-evolution-tracker-airflow:3.3.1-python3.13
+  env_file:
+    - .env
+  environment:
+    &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_DB_USER:-airflow}:${AIRFLOW_DB_PASSWORD:-airflow_dev_password}@postgres:5432/${AIRFLOW_DB_NAME:-airflow}
+    AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY:-}
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: 'http://airflow-apiserver:8080/execution/'
+    AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW_JWT_SECRET:-}
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
+    ANALYTICS_DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-analytics}:${POSTGRES_PASSWORD:-analytics_dev_password}@postgres:5432/${ANALYTICS_DB_NAME:-analytics}
+    PYTHONPATH: /opt/airflow
+  volumes:
+    - ./airflow/dags:/opt/airflow/dags
+    - ./airflow/logs:/opt/airflow/logs
+    - ./airflow/plugins:/opt/airflow/plugins
+    - ./shared:/opt/airflow/shared
+    - ./pipeline.py:/opt/airflow/pipeline.py
+    - ./data_raw:/opt/airflow/data_raw
+    - ./sql:/opt/airflow/sql
+  user: "${AIRFLOW_UID:-50000}:0"
+  depends_on:
+    &airflow-common-depends-on
+    postgres:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: fraud-pattern-evolution-tracker-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-analytics}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-analytics_dev_password}
+      POSTGRES_DB: ${POSTGRES_USER:-analytics}
+      AIRFLOW_DB_NAME: ${AIRFLOW_DB_NAME:-airflow}
+      AIRFLOW_DB_USER: ${AIRFLOW_DB_USER:-airflow}
+      AIRFLOW_DB_PASSWORD: ${AIRFLOW_DB_PASSWORD:-airflow_dev_password}
+      ANALYTICS_DB_NAME: ${ANALYTICS_DB_NAME:-analytics}
+      ANALYTICS_RO_USER: ${ANALYTICS_RO_USER:-analytics_ro}
+      ANALYTICS_RO_PASSWORD: ${ANALYTICS_RO_PASSWORD:-analytics_ro_dev_password}
+    ports:
+      - "${POSTGRES_HOST_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-analytics}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  airflow-init:
+    <<: *airflow-common
+    container_name: fraud-pattern-evolution-tracker-airflow-init
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        mkdir -v -p /opt/airflow/{logs,dags,plugins,config}
+        /entrypoint airflow version
+        /entrypoint airflow db migrate
+        airflow users list | grep -q "^${AIRFLOW_ADMIN_USER:-admin} " || /entrypoint airflow users create \
+          --username "${AIRFLOW_ADMIN_USER:-admin}" \
+          --password "${AIRFLOW_ADMIN_PASSWORD:-admin_dev_password}" \
+          --firstname Portfolio \
+          --lastname Admin \
+          --role Admin \
+          --email "${AIRFLOW_ADMIN_EMAIL:-admin@example.com}"
+    user: "0:0"
+
+  airflow-apiserver:
+    <<: *airflow-common
+    container_name: fraud-pattern-evolution-tracker-airflow-apiserver
+    command: api-server
+    ports:
+      - "${AIRFLOW_HOST_PORT:-8081}:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/monitor/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: fraud-pattern-evolution-tracker-airflow-scheduler
+    command: scheduler
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-dag-processor:
+    <<: *airflow-common
+    container_name: fraud-pattern-evolution-tracker-airflow-dag-processor
+    command: dag-processor
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type DagProcessorJob --hostname "$${HOSTNAME}"']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: docker/dashboard.Dockerfile
+    container_name: fraud-pattern-evolution-tracker-dashboard
+    env_file: [.env]
+    environment:
+      ANALYTICS_DATABASE_URL: postgresql+psycopg2://${ANALYTICS_RO_USER:-analytics_ro}:${ANALYTICS_RO_PASSWORD:-analytics_ro_dev_password}@postgres:5432/${ANALYTICS_DB_NAME:-analytics}
+    command: ["streamlit", "run", "dashboard/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+    ports:
+      - "${DASHBOARD_PORT:-8501}:8501"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

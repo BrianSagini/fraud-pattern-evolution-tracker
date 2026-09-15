@@ -1,0 +1,139 @@
+table RiskSummary
+	lineageTag: 2ecb1603-db13-4a92-9aa3-da971cfd8812
+
+	column total_transactions
+		dataType: int64
+		lineageTag: 897c31ab-335e-47bd-9e7d-b5997c9f00e1
+		summarizeBy: none
+		formatString: #,0
+		sourceColumn: total_transactions
+
+		annotation SummarizationSetBy = Automatic
+
+	column flagged_transactions
+		dataType: int64
+		lineageTag: 5d194aa2-8a8e-43c4-ac66-68d70ae92b43
+		summarizeBy: none
+		formatString: #,0
+		sourceColumn: flagged_transactions
+
+		annotation SummarizationSetBy = Automatic
+
+	column true_fraud_transactions
+		dataType: int64
+		lineageTag: 6327cf6c-1aea-48cc-b3eb-b76feb10e7e0
+		summarizeBy: none
+		formatString: #,0
+		sourceColumn: true_fraud_transactions
+
+		annotation SummarizationSetBy = Automatic
+
+	column true_fraud_amount
+		dataType: decimal
+		lineageTag: f26dd046-64bc-4d32-84c7-221db19efbe7
+		summarizeBy: none
+		formatString: "\$"#,0
+		sourceColumn: true_fraud_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column true_fraud_rate
+		dataType: decimal
+		lineageTag: 9812d520-0cdc-45e1-985b-e7702e4ec4c4
+		summarizeBy: none
+		formatString: 0.00%
+		sourceColumn: true_fraud_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column model_name
+		dataType: string
+		lineageTag: e474587b-54ca-4a91-a2e9-5b3db81d8d0d
+		summarizeBy: none
+		sourceColumn: model_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column precision
+		dataType: double
+		lineageTag: 0c13c329-f802-42e5-9d46-c994c11a2108
+		summarizeBy: none
+		formatString: 0.00%
+		sourceColumn: precision
+
+		annotation SummarizationSetBy = Automatic
+
+	column recall
+		dataType: double
+		lineageTag: f2673b82-897e-4f6b-9dfb-1838bcbd4a0f
+		summarizeBy: none
+		formatString: 0.00%
+		sourceColumn: recall
+
+		annotation SummarizationSetBy = Automatic
+
+	column f1
+		dataType: double
+		lineageTag: d80429b4-c63f-4346-855e-9d36850ae196
+		summarizeBy: none
+		formatString: 0.000
+		sourceColumn: f1
+
+		annotation SummarizationSetBy = Automatic
+
+	column roc_auc
+		dataType: double
+		lineageTag: 0bd8476c-a0f7-49a3-8076-2a6f6d828eb7
+		summarizeBy: none
+		formatString: 0.000
+		sourceColumn: roc_auc
+
+		annotation SummarizationSetBy = Automatic
+
+	column threshold
+		dataType: double
+		lineageTag: e74978d2-f34b-402f-835e-e9232f26db1c
+		summarizeBy: none
+		formatString: 0.00
+		sourceColumn: threshold
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'Total Transactions' = SUM(RiskSummary[total_transactions])
+		formatString: #,0
+		lineageTag: 45b1278c-df45-4aca-be1b-4972358aca8b
+
+	measure 'Flagged Transactions' = SUM(RiskSummary[flagged_transactions])
+		formatString: #,0
+		lineageTag: c040b9c5-3416-478a-9131-3802635a47e6
+
+	measure 'True Fraud Transactions' = SUM(RiskSummary[true_fraud_transactions])
+		formatString: #,0
+		lineageTag: 17d2469c-de6b-4570-8e6f-d9e555f958ce
+
+	measure 'True Fraud Rate' = AVERAGE(RiskSummary[true_fraud_rate])
+		formatString: 0.00%
+		lineageTag: dbab1ce6-d597-4780-90de-19928cd292dc
+
+	measure 'Model Precision' = AVERAGE(RiskSummary[precision])
+		formatString: 0.00%
+		lineageTag: b839c743-a6b4-4108-8253-c1377352ae78
+
+	measure 'Model Recall' = AVERAGE(RiskSummary[recall])
+		formatString: 0.00%
+		lineageTag: 9f14dd03-f21f-41b7-bf1f-5d657a986439
+
+	measure 'Model ROC AUC' = AVERAGE(RiskSummary[roc_auc])
+		formatString: 0.000
+		lineageTag: 8bc8a77c-9e75-47ab-857c-ad9350155601
+
+	partition RiskSummary = m
+		mode: import
+		source =
+				let
+					Source = PostgreSQL.Database("localhost:5433", "analytics"),
+					fraud_pattern_powerbi_risk_summary = Source{[Schema="fraud_pattern",Item="powerbi_risk_summary"]}[Data]
+				in
+					fraud_pattern_powerbi_risk_summary
+
+	annotation PBI_ResultType = Table

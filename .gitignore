@@ -1,0 +1,25 @@
+.env
+*.env
+!.env.example
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.log
+secrets/
+credentials/
+airflow/logs/*
+!airflow/logs/.gitkeep
+data_raw/*
+!data_raw/.gitkeep
+.DS_Store
+*.egg-info/
+.pytest_cache/
+
+# Power BI: .pbip projects (TMDL/PBIR) are text and committed; these are
+# per-machine local cache/credential artifacts Power BI Desktop generates
+# next to them and must never be committed.
+**/.pbi/localSettings.json
+**/*.pbix
+**/CachedData/
+**/*.abf

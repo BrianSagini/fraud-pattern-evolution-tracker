@@ -1,0 +1,67 @@
+table Trends
+	lineageTag: ccbcb219-2efa-4d4e-977f-bc6f90d52238
+
+	column month
+		dataType: dateTime
+		lineageTag: c0eef214-378f-4fd6-826a-c5d4f1914ae7
+		summarizeBy: none
+		formatString: yyyy-mm
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_transactions
+		dataType: int64
+		lineageTag: 941f604c-be4a-4684-be26-f1f8d3e19f47
+		summarizeBy: none
+		formatString: #,0
+		sourceColumn: total_transactions
+
+		annotation SummarizationSetBy = Automatic
+
+	column fraud_transactions
+		dataType: int64
+		lineageTag: 10ebfe70-0b8c-4211-8170-23076de78b65
+		summarizeBy: none
+		formatString: #,0
+		sourceColumn: fraud_transactions
+
+		annotation SummarizationSetBy = Automatic
+
+	column fraud_rate
+		dataType: double
+		lineageTag: 67607cb9-b43b-48c3-8991-dd032f957ffd
+		summarizeBy: none
+		formatString: 0.00%
+		sourceColumn: fraud_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_amount
+		dataType: decimal
+		lineageTag: 449f61d6-93f2-46af-9d05-ab2bb9de2852
+		summarizeBy: none
+		formatString: "\$"#,0
+		sourceColumn: total_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column fraud_amount
+		dataType: decimal
+		lineageTag: 9b0b7bea-06a4-4193-a907-e237c69818f0
+		summarizeBy: none
+		formatString: "\$"#,0
+		sourceColumn: fraud_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Trends = m
+		mode: import
+		source =
+				let
+					Source = PostgreSQL.Database("localhost:5433", "analytics"),
+					fraud_pattern_powerbi_trends = Source{[Schema="fraud_pattern",Item="powerbi_trends"]}[Data]
+				in
+					fraud_pattern_powerbi_trends
+
+	annotation PBI_ResultType = Table

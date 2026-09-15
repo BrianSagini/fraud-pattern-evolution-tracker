@@ -1,0 +1,11 @@
+# Version floors chosen to match what apache-airflow-core 3.3.1 and its
+# providers already require in the base image (verified via the pip
+# dependency-conflict warnings on first build) -- NOT pinned to exact
+# versions, so we never downgrade a package Airflow itself depends on.
+requests>=2.32.4
+sqlalchemy[asyncio]>=2.0.50
+scikit-learn>=1.6.0
+pandas>=2.2.3
+psycopg2-binary>=2.9.10
+openpyxl>=3.1.5
+networkx>=3.4.2

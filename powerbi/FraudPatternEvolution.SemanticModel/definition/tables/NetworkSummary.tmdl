@@ -1,0 +1,96 @@
+table NetworkSummary
+	lineageTag: 99d36c0c-ab02-4007-bba7-da6976103e12
+
+	column account_id
+		dataType: string
+		lineageTag: 148efbdc-98a6-4daa-add3-3d6122c9a577
+		summarizeBy: none
+		sourceColumn: account_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column account_type
+		dataType: string
+		lineageTag: d613ab0a-e3c1-4367-bff8-f90ae7bc6332
+		summarizeBy: none
+		sourceColumn: account_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column home_country
+		dataType: string
+		lineageTag: 6c429a34-186a-4629-add0-40a7502008e2
+		summarizeBy: none
+		sourceColumn: home_country
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_fraud_ring_member
+		dataType: boolean
+		lineageTag: eb16cb20-6b72-4e31-8250-2c41a9e0fc65
+		summarizeBy: none
+		sourceColumn: is_fraud_ring_member
+
+		annotation SummarizationSetBy = Automatic
+
+	column ring_id
+		dataType: string
+		lineageTag: 5bdf55b1-9d89-49e2-92a2-3999ccb04259
+		summarizeBy: none
+		sourceColumn: ring_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column component_id
+		dataType: int64
+		lineageTag: 095575ca-267b-464c-ba7e-b2de8aa55cd7
+		summarizeBy: none
+		formatString: 0
+		sourceColumn: component_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column component_size
+		dataType: int64
+		lineageTag: d446f745-2ad4-45b2-a604-85625466c6ad
+		summarizeBy: none
+		formatString: 0
+		sourceColumn: component_size
+
+		annotation SummarizationSetBy = Automatic
+
+	column degree
+		dataType: int64
+		lineageTag: 6242fc9c-0c66-40a0-a94b-54a3cc5098b5
+		summarizeBy: none
+		formatString: 0
+		sourceColumn: degree
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_ring_candidate
+		dataType: boolean
+		lineageTag: e5a39cc4-0c10-44eb-8a72-1219032c2e49
+		summarizeBy: none
+		sourceColumn: is_ring_candidate
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'Ring Candidate Accounts' = CALCULATE(DISTINCTCOUNT(NetworkSummary[account_id]), NetworkSummary[is_ring_candidate] = TRUE)
+		formatString: #,0
+		lineageTag: 1345ebc1-f664-4f03-90cf-c35ae3a7b636
+
+	measure 'Avg Cluster Size' = AVERAGE(NetworkSummary[component_size])
+		formatString: 0.0
+		lineageTag: 43534d48-7840-453a-8699-3214cca530c2
+
+	partition NetworkSummary = m
+		mode: import
+		source =
+				let
+					Source = PostgreSQL.Database("localhost:5433", "analytics"),
+					fraud_pattern_powerbi_network_summary = Source{[Schema="fraud_pattern",Item="powerbi_network_summary"]}[Data]
+				in
+					fraud_pattern_powerbi_network_summary
+
+	annotation PBI_ResultType = Table
