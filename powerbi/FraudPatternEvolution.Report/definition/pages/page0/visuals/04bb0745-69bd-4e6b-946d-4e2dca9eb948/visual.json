@@ -1,12 +1,12 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
-  "name": "b85310c1-1310-40af-80de-cd0867f7cd7f",
+  "name": "04bb0745-69bd-4e6b-946d-4e2dca9eb948",
   "position": {
-    "x": 260,
-    "y": 120,
+    "x": 16,
+    "y": 200,
     "z": 0,
-    "width": 220,
-    "height": 120,
+    "width": 406,
+    "height": 108,
     "tabOrder": 0
   },
   "visual": {
@@ -23,11 +23,11 @@
                       "Entity": "RiskSummary"
                     }
                   },
-                  "Property": "Model Recall"
+                  "Property": "Model Precision"
                 }
               },
-              "queryRef": "RiskSummary.Model Recall",
-              "nativeQueryRef": "Model Recall"
+              "queryRef": "RiskSummary.Model Precision",
+              "nativeQueryRef": "Model Precision"
             }
           ]
         }
@@ -40,7 +40,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Model Recall'"
+                  "Value": "'Model Precision'"
                 }
               }
             },

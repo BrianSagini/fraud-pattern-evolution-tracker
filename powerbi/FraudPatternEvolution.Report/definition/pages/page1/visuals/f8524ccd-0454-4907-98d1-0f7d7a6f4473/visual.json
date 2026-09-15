@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "f8524ccd-0454-4907-98d1-0f7d7a6f4473",
   "position": {
-    "x": 20,
-    "y": 8,
+    "x": 16,
+    "y": 12,
     "z": 0,
-    "width": 1240,
-    "height": 48,
+    "width": 1248,
+    "height": 52,
     "tabOrder": 0
   },
   "visual": {
@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Fraud Pattern Evolution Tracker  \u2014  Fraud Trends",
+                    "value": "Fraud Pattern Evolution Tracker  \u2014  Fraud Trends & Pattern Analysis",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
                       "fontSize": "18px",
