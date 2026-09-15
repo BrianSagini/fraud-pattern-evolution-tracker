@@ -1,0 +1,91 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
+  "name": "96169900-42f5-42d4-9414-84dff9b660bf",
+  "position": {
+    "x": 20,
+    "y": 400,
+    "z": 0,
+    "width": 1000,
+    "height": 260,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Trends"
+                    }
+                  },
+                  "Property": "month"
+                }
+              },
+              "queryRef": "Trends.month",
+              "nativeQueryRef": "month"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Trends"
+                    }
+                  },
+                  "Property": "total_amount"
+                }
+              },
+              "queryRef": "Trends.total_amount",
+              "nativeQueryRef": "total_amount"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Trends"
+                    }
+                  },
+                  "Property": "fraud_amount"
+                }
+              },
+              "queryRef": "Trends.fraud_amount",
+              "nativeQueryRef": "fraud_amount"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Transaction Volume vs. Fraud Volume'"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

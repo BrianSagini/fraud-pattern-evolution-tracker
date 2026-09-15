@@ -1,0 +1,59 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
+  "name": "b5fc7409-fdda-45a1-9d58-3ddaf1137965",
+  "position": {
+    "x": 500,
+    "y": 60,
+    "z": 0,
+    "width": 220,
+    "height": 120,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RiskSummary"
+                    }
+                  },
+                  "Property": "True Fraud Rate"
+                }
+              },
+              "queryRef": "RiskSummary.True Fraud Rate",
+              "nativeQueryRef": "True Fraud Rate"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'True Fraud Rate'"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

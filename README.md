@@ -58,10 +58,14 @@ bug; a real fraud-alert queue commonly runs at similar precision. Full detail:
 ## Power BI
 
 A real `.pbip` project (`powerbi/FraudPatternEvolution.pbip`) exists with the complete data model
-— 3 tables, 9 DAX measures — but **it has never been opened in Power BI Desktop, so it isn't
-validated.** The 4 report pages exist but have no visuals yet (page 3's confusion-matrix breakdown
-additionally needs a new SQL view first — see `docs/powerbi_guide.md`). Page 4 is a table of
-ring-candidate accounts, not a fabricated network diagram — Power BI has no reliable first-party
+— 3 tables, 9 DAX measures — **and 14 real visuals across all 4 pages** (see
+`docs/powerbi_guide.md`'s visual inventory; page 3's ideal confusion-matrix breakdown additionally
+needs a new SQL view, so it uses the real aggregate metrics instead for now). **Rendering is not
+verified**: the outer project structure was confirmed openable by Power BI Desktop in one safe
+test on a sibling project, but the visual JSON itself was never opened (a second validation
+attempt captured unrelated desktop content and was stopped — full account in
+`docs/powerbi_guide.md`). Page 4 is a table of ring-candidate accounts, not a fabricated network
+diagram — Power BI has no reliable first-party
 force-directed graph visual, and the table already answers what the data supports.
 
 ## Documentation
