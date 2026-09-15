@@ -36,17 +36,22 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Aggregation": {
                   "Expression": {
-                    "SourceRef": {
-                      "Entity": "Trends"
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Trends"
+                        }
+                      },
+                      "Property": "fraud_rate"
                     }
                   },
-                  "Property": "fraud_rate"
+                  "Function": 1
                 }
               },
               "queryRef": "Trends.fraud_rate",
-              "nativeQueryRef": "fraud_rate"
+              "nativeQueryRef": "Average of fraud_rate"
             }
           ]
         }

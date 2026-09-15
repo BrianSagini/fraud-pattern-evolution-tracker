@@ -36,17 +36,17 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "NetworkSummary"
                     }
                   },
-                  "Property": "component_size"
+                  "Property": "Avg Cluster Size"
                 }
               },
-              "queryRef": "NetworkSummary.component_size",
-              "nativeQueryRef": "component_size"
+              "queryRef": "NetworkSummary.Avg Cluster Size",
+              "nativeQueryRef": "Avg Cluster Size"
             }
           ]
         }

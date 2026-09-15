@@ -36,31 +36,41 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Aggregation": {
                   "Expression": {
-                    "SourceRef": {
-                      "Entity": "Trends"
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Trends"
+                        }
+                      },
+                      "Property": "total_amount"
                     }
                   },
-                  "Property": "total_amount"
+                  "Function": 0
                 }
               },
               "queryRef": "Trends.total_amount",
-              "nativeQueryRef": "total_amount"
+              "nativeQueryRef": "Sum of total_amount"
             },
             {
               "field": {
-                "Column": {
+                "Aggregation": {
                   "Expression": {
-                    "SourceRef": {
-                      "Entity": "Trends"
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Trends"
+                        }
+                      },
+                      "Property": "fraud_amount"
                     }
                   },
-                  "Property": "fraud_amount"
+                  "Function": 0
                 }
               },
               "queryRef": "Trends.fraud_amount",
-              "nativeQueryRef": "fraud_amount"
+              "nativeQueryRef": "Sum of fraud_amount"
             }
           ]
         }

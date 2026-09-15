@@ -56,10 +56,10 @@
       ]
     },
     "objects": {
-      "dataPoint": [
+      "labels": [
         {
           "properties": {
-            "defaultColor": {
+            "color": {
               "solid": {
                 "color": {
                   "expr": {

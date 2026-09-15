@@ -12,14 +12,27 @@ exposes true/false positive/negative counts, only aggregate metrics) — not yet
 the real aggregate metrics instead, do not approximate a confusion matrix from precision/recall
 in DAX.
 
-**Power BI Desktop validation status: PARTIALLY VERIFIED, via the sibling Climate Risk project.**
-The project owner actually opened `ClimateRisk.pbip` and reported real bugs (blank charts, no
-titles, a literal `\$`, wrong date format, maps disabled for their tenant) — root causes found and
-fixed identically across all 4 projects, this one included (full diagnostic account in Climate's
-`docs/powerbi_guide.md`). **This project's own file has not been independently reopened** — its
-fixes and this round's styling are structurally validated (every field/measure reference checked
-against the live model, no overlaps, no blank pages) but not yet confirmed by an actual render.
-If you open this file and something doesn't render correctly, that's real information — say so.
+**Power BI Desktop validation status: FULLY VERIFIED. All 4 pages confirmed rendering correctly
+with real data, real colors, in Power BI Desktop** (see `docs/evidence/page1_executive_overview.png`
+through `page4_pattern_network_analysis.png`).
+
+The root causes behind the original round-2 bugs (blank charts, no titles, a literal `\$`, wrong
+date format, maps disabled for the tenant) were found on the sibling Climate Risk project and
+fixed identically here — see Climate's `docs/powerbi_guide.md` for that diagnostic account. This
+project's own file was then independently reopened in Desktop, where it first failed to load
+entirely with "Your report has issues that could not be resolved" — `report.json`'s
+`themeCollection.baseTheme.reportVersionAtImport` was a bare string (`"5.55"`) instead of the
+required `{visual, report, page}` object. Fixed to match Climate's shape.
+
+After that fix, the file loaded but with an empty local data cache — Import-mode `.pbip` files
+carry no data of their own, so a first open needs an explicit Refresh (Home → Refresh) to pull rows
+from Postgres; this is expected, not a bug, and all 3 tables (1 / 12 / 5,000 rows) loaded correctly
+once refreshed. Separately, every chart Y-field bound as a raw, unaggregated `Column` reference
+rendered as a completely empty plot area regardless of refresh state — fixed by pointing
+`Avg Cluster Size by Home Country` at the existing `Avg Cluster Size` measure, and wrapping
+`Transaction Volume vs. Fraud Volume` (`Function: 0`, Sum) and `Fraud Rate Over Time`
+(`Function: 1`, Average) in Desktop's own confirmed `Aggregation` field shape, since no matching
+measures existed for those `Trends` columns.
 
 ## Data connectivity
 
