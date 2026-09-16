@@ -9,9 +9,9 @@ account/competition rules or under NDA in practice (see `docs/data_sources.md`),
 The key design choice: **15 fraud rings** (3–8 accounts each) are injected, sharing a device/IP and
 transacting in short bursts of unusually large amounts, plus a background ~0.4% "organic" (non-ring)
 fraud rate on ordinary accounts. Because the generator *is* the ground truth
-(`accounts.is_fraud_ring_member`, `transactions.is_fraud`), the model-evaluation metrics computed
-downstream (precision/recall/F1/ROC-AUC) are genuinely checkable — unlike most fraud-detection demos
-built on unlabeled data, where "the model found something" can't be verified at all.
+(`accounts.is_fraud_ring_member`, `transactions.is_fraud`), I can check the model-evaluation
+metrics computed downstream (precision/recall/F1/ROC-AUC) against a real known answer, instead of
+just reporting a score with nothing to verify it against.
 
 ## Graph / connected-account analysis (`fraud_pattern.graph_metrics`)
 
