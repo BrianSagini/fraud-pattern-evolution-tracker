@@ -59,7 +59,7 @@ table Trends
 		mode: import
 		source =
 				let
-					Source = PostgreSQL.Database("localhost:5433", "analytics"),
+					Source = PostgreSQL.Database("localhost:5443", "analytics"),
 					fraud_pattern_powerbi_trends = Source{[Schema="fraud_pattern",Item="powerbi_trends"]}[Data]
 				in
 					fraud_pattern_powerbi_trends

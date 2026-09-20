@@ -131,7 +131,7 @@ table RiskSummary
 		mode: import
 		source =
 				let
-					Source = PostgreSQL.Database("localhost:5433", "analytics"),
+					Source = PostgreSQL.Database("localhost:5443", "analytics"),
 					fraud_pattern_powerbi_risk_summary = Source{[Schema="fraud_pattern",Item="powerbi_risk_summary"]}[Data]
 				in
 					fraud_pattern_powerbi_risk_summary
