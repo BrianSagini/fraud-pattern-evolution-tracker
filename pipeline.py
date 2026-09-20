@@ -3,11 +3,10 @@
 100% SYNTHETIC transaction data. Real labeled fraud datasets are either
 gated behind a Kaggle competition account or under NDA in practice (see
 docs/data_sources.md) -- a generator with injected fraud rings is used
-instead. Crucially, because we control the ground truth here
+instead. Because the generator controls the ground truth here
 (`is_fraud`/`is_fraud_ring_member`), the model-evaluation metrics
-(precision/recall/F1/ROC-AUC) computed downstream are genuinely
-meaningful, unlike most demo fraud projects that have no ground truth
-to check anomaly scores against at all.
+(precision/recall/F1/ROC-AUC) computed downstream can be checked against
+a real known answer, not just reported as a score.
 """
 from __future__ import annotations
 
@@ -30,6 +29,7 @@ MERCHANT_CATEGORIES = ["Grocery", "Electronics", "Travel", "Restaurants", "Onlin
 ACCOUNT_TYPES = ["Checking", "Savings", "Credit Card"]
 
 RAW_DIR = os.path.join(os.path.dirname(__file__), "data_raw")
+EVIDENCE_DIR = os.path.join(os.path.dirname(__file__), "docs", "evidence")
 
 
 def _generate_accounts(rng: np.random.Generator) -> pd.DataFrame:
@@ -242,6 +242,325 @@ def evaluate_model_and_load() -> dict:
     }
     upsert_dataframe(pd.DataFrame([metrics]), schema="fraud_pattern", table="model_evaluation", key_columns=["model_name"])
     return metrics
+
+
+# Last 3 of 12 months held out as the test set. A random split would let
+# February's fraud patterns leak into a January test fold -- no fraud
+# model deployed for real ever gets scored on transactions from before
+# the ones it trained on, so this project doesn't evaluate itself that
+# way either.
+SUPERVISED_TEST_SPLIT_DATE = "2025-10-01"
+
+# accounts.is_fraud_ring_member / ring_id are deliberately excluded --
+# they're literally how the synthetic ground truth was constructed, so
+# using them as a feature would be leaking the label itself, not
+# learning a real predictive signal.
+SUPERVISED_NUMERIC_FEATURES = ["amount", "amount_zscore", "hour", "day_of_week", "component_size", "degree", "is_ring_candidate"]
+SUPERVISED_CATEGORICAL_FEATURES = ["merchant_category", "account_type", "home_country"]
+
+
+def _load_supervised_training_frame() -> pd.DataFrame:
+    from shared.database import get_engine
+
+    engine = get_engine()
+    df = pd.read_sql(
+        """
+        SELECT t.transaction_id, t.account_id, t.txn_timestamp, t.amount,
+               t.merchant_category, t.is_fraud,
+               a.account_type, a.home_country,
+               g.component_size, g.degree, g.is_ring_candidate
+        FROM fraud_pattern.transactions t
+        JOIN fraud_pattern.accounts a ON a.account_id = t.account_id
+        LEFT JOIN fraud_pattern.graph_metrics g ON g.account_id = t.account_id
+        """,
+        engine,
+    )
+    df["txn_timestamp"] = pd.to_datetime(df["txn_timestamp"])
+    df["hour"] = df["txn_timestamp"].dt.hour
+    df["day_of_week"] = df["txn_timestamp"].dt.dayofweek
+    df["is_ring_candidate"] = df["is_ring_candidate"].fillna(False).astype(int)
+    df["component_size"] = df["component_size"].fillna(1)
+    df["degree"] = df["degree"].fillna(0)
+    return df
+
+
+def _add_account_zscore(train: pd.DataFrame, test: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Per-account amount z-score, fit on the train split only -- fitting
+    it on the full dataset (train+test) would leak test-period spending
+    behavior into a feature used to score the test set."""
+    acct_stats = train.groupby("account_id")["amount"].agg(["mean", "std"]).rename(
+        columns={"mean": "acct_mean", "std": "acct_std"}
+    )
+    acct_stats["acct_std"] = acct_stats["acct_std"].fillna(1).replace(0, 1)
+    global_mean = float(train["amount"].mean())
+    global_std = float(train["amount"].std() or 1.0)
+
+    def _apply(split: pd.DataFrame) -> pd.DataFrame:
+        out = split.merge(acct_stats, on="account_id", how="left")
+        out["acct_mean"] = out["acct_mean"].fillna(global_mean)
+        out["acct_std"] = out["acct_std"].fillna(global_std)
+        out["amount_zscore"] = (out["amount"] - out["acct_mean"]) / out["acct_std"]
+        return out.drop(columns=["acct_mean", "acct_std"])
+
+    return _apply(train), _apply(test)
+
+
+def build_supervised_features(
+    df: pd.DataFrame,
+) -> tuple[pd.DataFrame, pd.DataFrame, "OneHotEncoder"]:
+    """Split df by SUPERVISED_TEST_SPLIT_DATE, engineer features on each
+    side independently (see _add_account_zscore), and fit the categorical
+    encoder on the train split only. Returns (train, test, fitted_encoder)
+    -- callers build the final X matrix with encode_features()."""
+    from sklearn.preprocessing import OneHotEncoder
+
+    train = df[df["txn_timestamp"] < SUPERVISED_TEST_SPLIT_DATE].copy()
+    test = df[df["txn_timestamp"] >= SUPERVISED_TEST_SPLIT_DATE].copy()
+    train, test = _add_account_zscore(train, test)
+
+    encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
+    encoder.fit(train[SUPERVISED_CATEGORICAL_FEATURES])
+    return train, test, encoder
+
+
+def encode_features(split: pd.DataFrame, encoder: "OneHotEncoder") -> tuple[np.ndarray, list[str]]:
+    numeric = split[SUPERVISED_NUMERIC_FEATURES].fillna(0).to_numpy()
+    cats = encoder.transform(split[SUPERVISED_CATEGORICAL_FEATURES])
+    feature_names = SUPERVISED_NUMERIC_FEATURES + list(encoder.get_feature_names_out(SUPERVISED_CATEGORICAL_FEATURES))
+    return np.hstack([numeric, cats]), feature_names
+
+
+def build_supervised_models(scale_pos_weight: float) -> dict:
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.linear_model import LogisticRegression
+    from xgboost import XGBClassifier
+
+    return {
+        "logistic_regression": LogisticRegression(
+            max_iter=2000, class_weight="balanced", random_state=RNG_SEED
+        ),
+        "random_forest": RandomForestClassifier(
+            n_estimators=300, max_depth=10, class_weight="balanced", random_state=RNG_SEED, n_jobs=-1
+        ),
+        "xgboost": XGBClassifier(
+            n_estimators=300, max_depth=5, learning_rate=0.1,
+            scale_pos_weight=scale_pos_weight, eval_metric="logloss", random_state=RNG_SEED,
+        ),
+    }
+
+
+def train_supervised_models() -> dict:
+    """Train Logistic Regression, Random Forest, and XGBoost on the known
+    `is_fraud` label with the time-based split above, and evaluate every
+    one of them -- plus the existing unsupervised IsolationForest -- on
+    the same held-out test set for a fair head-to-head. Writes every
+    model's real metrics to fraud_pattern.model_evaluation (whichever way
+    they land: a model that loses to IsolationForest here is left in the
+    table as a real result, not filtered out), the test-set predictions
+    to fraud_pattern.anomaly_scores, and each model's feature importances
+    to fraud_pattern.feature_importance."""
+    from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
+
+    df = _load_supervised_training_frame()
+    train, test, encoder = build_supervised_features(df)
+    X_train, feature_names = encode_features(train, encoder)
+    X_test, _ = encode_features(test, encoder)
+    y_train = train["is_fraud"].astype(int).to_numpy()
+    y_test = test["is_fraud"].astype(int).to_numpy()
+
+    scale_pos_weight = (y_train == 0).sum() / max(int((y_train == 1).sum()), 1)
+    models = build_supervised_models(scale_pos_weight)
+
+    all_metrics, all_predictions, importance_rows = [], [], []
+    fitted, probas = {}, {}
+    computed_at = datetime.now(timezone.utc)
+
+    for model_name, model in models.items():
+        model.fit(X_train, y_train)
+        proba = model.predict_proba(X_test)[:, 1]
+        pred = (proba >= 0.5).astype(int)
+        fitted[model_name] = model
+        probas[model_name] = proba
+
+        all_metrics.append({
+            "model_name": model_name,
+            "precision": float(precision_score(y_test, pred, zero_division=0)),
+            "recall": float(recall_score(y_test, pred, zero_division=0)),
+            "f1": float(f1_score(y_test, pred, zero_division=0)),
+            "roc_auc": float(roc_auc_score(y_test, proba)),
+            "threshold": 0.5,
+            "computed_at": computed_at,
+        })
+        all_predictions.append(pd.DataFrame({
+            "transaction_id": test["transaction_id"].to_numpy(),
+            "model_name": model_name,
+            "raw_anomaly_score": proba,
+            "is_flagged": pred.astype(float),
+        }))
+
+        if hasattr(model, "feature_importances_"):
+            importances = model.feature_importances_
+        else:
+            importances = np.abs(model.coef_[0])
+            importances = importances / importances.sum()
+        for rank, idx in enumerate(np.argsort(-importances), start=1):
+            importance_rows.append({
+                "model_name": model_name,
+                "feature_name": feature_names[idx],
+                "importance": float(importances[idx]),
+                "rank": rank,
+                "computed_at": computed_at,
+            })
+
+    upsert_dataframe(pd.DataFrame(all_metrics), schema="fraud_pattern", table="model_evaluation", key_columns=["model_name"])
+    bulk_upsert_dataframe(
+        pd.concat(all_predictions, ignore_index=True), schema="fraud_pattern", table="anomaly_scores",
+        key_columns=["transaction_id", "model_name"],
+    )
+    bulk_upsert_dataframe(
+        pd.DataFrame(importance_rows), schema="fraud_pattern", table="feature_importance",
+        key_columns=["model_name", "feature_name"],
+    )
+
+    iso_raw, iso_flagged = _load_isolation_forest_test_scores(test["transaction_id"])
+
+    # The existing isolation_forest_v1 row in model_evaluation is computed
+    # over the full year (see evaluate_model_and_load) -- not the same
+    # population as the 3 supervised models above, which only ever see the
+    # Oct-Dec test window. Comparing those numbers directly would be
+    # comparing two different test sets, not a fair head-to-head. This
+    # second row re-evaluates the *same* unsupervised model's *existing*
+    # predictions restricted to that exact window, so the four models can
+    # actually be compared apples-to-apples. The original full-year row is
+    # left untouched -- other docs and the Power BI report reference it.
+    iso_test_metrics = {
+        "model_name": "isolation_forest_v1_test_window",
+        "precision": float(precision_score(y_test, iso_flagged, zero_division=0)),
+        "recall": float(recall_score(y_test, iso_flagged, zero_division=0)),
+        "f1": float(f1_score(y_test, iso_flagged, zero_division=0)),
+        "roc_auc": float(roc_auc_score(y_test, iso_raw)),
+        "threshold": 0.5,
+        "computed_at": computed_at,
+    }
+    upsert_dataframe(pd.DataFrame([iso_test_metrics]), schema="fraud_pattern", table="model_evaluation", key_columns=["model_name"])
+    all_metrics_with_baseline = all_metrics + [iso_test_metrics]
+
+    supervised_preds = {name: (proba >= 0.5).astype(int) for name, proba in probas.items()}
+    save_evaluation_artifacts(
+        y_test=y_test,
+        probas={"isolation_forest_v1": iso_raw, **probas},
+        fitted_models=fitted,
+        X_test=X_test,
+        feature_names=feature_names,
+        preds={"isolation_forest_v1": iso_flagged, **supervised_preds},
+    )
+
+    return {
+        "metrics": all_metrics_with_baseline,
+        "train_rows": int(len(train)),
+        "test_rows": int(len(test)),
+        "train_fraud": int(y_train.sum()),
+        "test_fraud": int(y_test.sum()),
+    }
+
+
+def _load_isolation_forest_test_scores(test_transaction_ids: pd.Series) -> tuple[np.ndarray, np.ndarray]:
+    """Pull the existing unsupervised model's scores for the same test-set
+    transaction ids, so the comparison plots/metrics use its real,
+    already-computed predictions rather than retraining it a second time.
+    Returns (raw_anomaly_score, is_flagged) -- the raw score is continuous
+    (used for ROC-AUC, which only needs a ranking), is_flagged is the
+    model's own {0,1} decision (used for precision/recall/F1, since a 0.5
+    cut on the raw score isn't the threshold IsolationForest actually
+    used)."""
+    from shared.database import get_engine
+
+    engine = get_engine()
+    ids = pd.DataFrame({"transaction_id": test_transaction_ids})
+    scores = pd.read_sql(
+        "SELECT transaction_id, raw_anomaly_score, is_flagged FROM fraud_pattern.anomaly_scores "
+        "WHERE model_name = 'isolation_forest_v1'",
+        engine,
+    )
+    merged = ids.merge(scores, on="transaction_id", how="left")
+    raw = merged["raw_anomaly_score"].fillna(0).to_numpy()
+    flagged = (merged["is_flagged"].fillna(0) > 0.5).astype(int).to_numpy()
+    return raw, flagged
+
+
+def save_evaluation_artifacts(
+    *,
+    y_test: np.ndarray,
+    probas: dict[str, np.ndarray],
+    fitted_models: dict,
+    X_test: np.ndarray,
+    feature_names: list[str],
+    preds: dict[str, np.ndarray] | None = None,
+) -> None:
+    """Confusion matrices + ROC curves for all 4 models (the 3 supervised
+    ones plus the existing IsolationForest), and a SHAP summary plot for
+    XGBoost -- saved as real PNGs from this actual run, not mocked.
+
+    `probas` are continuous scores, used for ROC curves (only the ranking
+    matters, so IsolationForest's differently-scaled raw_anomaly_score
+    works fine here). `preds` are each model's actual binary decision,
+    used for confusion matrices -- for the 3 supervised models that's a
+    0.5 cut on a real probability, but IsolationForest's raw score isn't a
+    0-1 probability, so its own `is_flagged` decision must be passed in
+    explicitly rather than assumed from a 0.5 cut on `probas`."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    import shap
+    from sklearn.metrics import ConfusionMatrixDisplay, roc_auc_score, roc_curve
+
+    os.makedirs(EVIDENCE_DIR, exist_ok=True)
+    model_order = ["isolation_forest_v1", "logistic_regression", "random_forest", "xgboost"]
+    preds = preds or {}
+
+    fig, axes = plt.subplots(1, 4, figsize=(20, 5))
+    for ax, model_name in zip(axes, model_order):
+        pred = preds.get(model_name, (probas[model_name] >= 0.5).astype(int))
+        ConfusionMatrixDisplay.from_predictions(
+            y_test, pred, ax=ax, colorbar=False, cmap="Blues", display_labels=["legit", "fraud"]
+        )
+        ax.set_title(model_name)
+    fig.suptitle("Confusion matrices on the held-out test set (Oct-Dec 2025), threshold 0.5")
+    fig.tight_layout()
+    fig.savefig(os.path.join(EVIDENCE_DIR, "fraud_confusion_matrices.png"), dpi=150)
+    plt.close(fig)
+
+    fig, ax = plt.subplots(figsize=(7, 6))
+    for model_name in model_order:
+        fpr, tpr, _ = roc_curve(y_test, probas[model_name])
+        auc = roc_auc_score(y_test, probas[model_name])
+        ax.plot(fpr, tpr, label=f"{model_name} (AUC={auc:.3f})")
+    ax.plot([0, 1], [0, 1], "k--", alpha=0.3, label="random")
+    ax.set_xlabel("False positive rate")
+    ax.set_ylabel("True positive rate")
+    ax.set_title("ROC curves on the held-out test set")
+    ax.legend(loc="lower right")
+    fig.tight_layout()
+    fig.savefig(os.path.join(EVIDENCE_DIR, "fraud_roc_curves.png"), dpi=150)
+    plt.close(fig)
+
+    xgb_model = fitted_models["xgboost"]
+    sample_size = min(2000, X_test.shape[0])
+    rng = np.random.default_rng(RNG_SEED)
+    sample_idx = rng.choice(X_test.shape[0], size=sample_size, replace=False)
+    X_sample = X_test[sample_idx]
+    explainer = shap.TreeExplainer(xgb_model)
+    shap_values = explainer.shap_values(X_sample)
+
+    shap.summary_plot(
+        shap_values, X_sample, feature_names=feature_names, plot_type="bar", show=False, max_display=12
+    )
+    fig = plt.gcf()
+    fig.set_size_inches(11, 6)
+    plt.title(f"XGBoost mean |SHAP| feature importance\n({sample_size} test-set transactions)")
+    fig.tight_layout()
+    fig.savefig(os.path.join(EVIDENCE_DIR, "fraud_shap_importance.png"), dpi=150)
+    plt.close(fig)
 
 
 def generate_explainable_alerts() -> int:

@@ -51,6 +51,15 @@ CREATE TABLE IF NOT EXISTS fraud_pattern.model_evaluation (
     computed_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS fraud_pattern.feature_importance (
+    model_name       TEXT NOT NULL,
+    feature_name     TEXT NOT NULL,
+    importance       DOUBLE PRECISION NOT NULL,
+    rank             INT NOT NULL,
+    computed_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (model_name, feature_name)
+);
+
 CREATE TABLE IF NOT EXISTS fraud_pattern.fraud_trends (
     month                DATE PRIMARY KEY,
     total_transactions   INT,

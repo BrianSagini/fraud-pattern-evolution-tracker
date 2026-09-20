@@ -3,8 +3,10 @@
 100% synthetic transactions with injected fraud rings (see
 projects/04_fraud_pattern_evolution/pipeline.py) -> validate -> load ->
 graph analytics (connected accounts) -> unsupervised anomaly detection ->
-model evaluation against synthetic ground truth -> explainable alerts ->
-fraud trend SQL -> data-quality check.
+model evaluation against synthetic ground truth -> supervised model
+training (Logistic Regression / Random Forest / XGBoost, time-based
+train/test split, evaluated head-to-head against the unsupervised
+model) -> explainable alerts -> fraud trend SQL -> data-quality check.
 """
 from __future__ import annotations
 
@@ -81,7 +83,11 @@ with DAG(
         return pipeline.evaluate_model_and_load()
 
     @task
-    def generate_alerts(_graph_rows: int, _eval_result: dict) -> int:
+    def train_supervised_models(_graph_rows: int, _eval_result: dict) -> dict:
+        return pipeline.train_supervised_models()
+
+    @task
+    def generate_alerts(_graph_rows: int, _eval_result: dict, _supervised_result: dict) -> int:
         return pipeline.generate_explainable_alerts()
 
     @task
@@ -98,15 +104,20 @@ with DAG(
         engine = get_engine()
         with engine.connect() as conn:
             total_txns = conn.exec_driver_sql("SELECT COUNT(*) FROM fraud_pattern.transactions").scalar()
-            eval_row = conn.exec_driver_sql(
-                "SELECT precision, recall, f1, roc_auc FROM fraud_pattern.model_evaluation WHERE model_name = 'isolation_forest_v1'"
-            ).first()
+            eval_rows = conn.exec_driver_sql(
+                "SELECT model_name, roc_auc FROM fraud_pattern.model_evaluation"
+            ).all()
         if total_txns == 0:
             raise ValueError("fraud_pattern.transactions is empty after load")
-        if eval_row is None:
-            raise ValueError("model_evaluation row missing for isolation_forest_v1")
-        if eval_row.roc_auc is None or eval_row.roc_auc < 0.5:
-            raise ValueError(f"Anomaly model ROC-AUC ({eval_row.roc_auc}) is no better than random -- investigate")
+
+        eval_by_model = {row.model_name: row.roc_auc for row in eval_rows}
+        expected_models = {"isolation_forest_v1", "logistic_regression", "random_forest", "xgboost"}
+        missing = expected_models - eval_by_model.keys()
+        if missing:
+            raise ValueError(f"model_evaluation missing rows for: {sorted(missing)}")
+        for model_name, roc_auc in eval_by_model.items():
+            if roc_auc is None or roc_auc < 0.5:
+                raise ValueError(f"{model_name} ROC-AUC ({roc_auc}) is no better than random -- investigate")
 
     schema = ensure_schema()
     gen = generate_data()
@@ -114,13 +125,15 @@ with DAG(
     graph = graph_analytics(loaded)
     anomalies = anomaly_detection(loaded)
     evaluation = evaluate_model(anomalies)
-    alerts = generate_alerts(graph, evaluation)
+    supervised = train_supervised_models(graph, evaluation)
+    alerts = generate_alerts(graph, evaluation, supervised)
     trends = compute_trends(loaded)
     views = create_powerbi_views(alerts, trends)
     dq = data_quality_check(views)
 
     schema >> gen >> loaded >> [graph, anomalies]
     anomalies >> evaluation
-    [graph, evaluation] >> alerts
+    [graph, evaluation] >> supervised
+    [graph, evaluation, supervised] >> alerts
     loaded >> trends
     [alerts, trends] >> views >> dq

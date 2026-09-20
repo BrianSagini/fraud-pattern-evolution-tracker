@@ -38,6 +38,11 @@ The DAG takes 15-20 minutes end to end (generation → graph analytics → model
 evaluation). Dashboard's at http://localhost:8504 once it's done. `docker compose down` shuts
 everything down without losing data.
 
+The AutoML sanity-check cells at the end of `fraud_model_comparison.ipynb` are optional and
+local-only — they're not part of the Airflow DAG or the container image. Running them needs
+`pip install -r requirements-notebooks.txt` in a local virtualenv plus a JVM on your machine (H2O
+starts its own local Java process); skip that cell block entirely if you don't have Java installed.
+
 ## What the pipeline does
 
 Ensure schema → generate the synthetic accounts and transactions → validate and load → graph
@@ -60,6 +65,51 @@ labeled validation set and whatever review capacity the fraud team actually has 
 demonstrates the detection methodology, not a tuned production threshold. Full walkthrough:
 `docs/methodology.md`.
 
+## Machine learning
+
+The IsolationForest above never sees a fraud label. Since I control the ground truth in this
+project, the natural follow-up question is how much better a model *with* access to the label can
+actually do — so I added three supervised models (Logistic Regression, Random Forest, XGBoost),
+trained on a proper time-based split (train on Jan–Sep 2025, test on the held-out Oct–Dec 2025 —
+never a random split, which would let September's fraud patterns leak into an August test fold),
+and compared all four head-to-head on the exact same test window.
+
+| Model | Precision | Recall | F1 | ROC-AUC |
+|---|---|---|---|---|
+| IsolationForest (re-scored on this test window) | 0.126 | 0.795 | **0.218** | 0.927 |
+| Logistic Regression | 0.081 | 0.823 | 0.147 | **0.947** |
+| Random Forest | 0.108 | 0.774 | 0.190 | 0.931 |
+| XGBoost | 0.077 | 0.333 | 0.125 | 0.801 |
+
+No model wins on every metric, and I'm reporting that plainly rather than picking whichever number
+flatters the newest model. Logistic Regression edges out the unsupervised baseline on ROC-AUC and
+recall; the baseline still wins on precision and F1 despite never seeing a label at all. The
+result I didn't expect: **XGBoost is the worst performer on every single metric**, missing 2 out of
+every 3 fraud cases in the test set. With only 827 fraud examples in the training period, its 300
+trees at depth 5 most plausibly overfit harder than Random Forest's shallower bagged ensemble or
+Logistic Regression's much simpler boundary — a fair critique of this run's untuned
+hyperparameters, not a claim about gradient boosting generally.
+
+SHAP on XGBoost puts `amount` well ahead of everything else, followed by `degree` — a feature that
+comes from the graph analysis this project already computes for ring detection, which turns out to
+carry real predictive value here too. Digging into why two *other* graph features carried zero
+weight surfaced a genuine data-generation quirk worth stating plainly: every one of the 5,000
+accounts lands in a single giant connected component, so `component_size` and `is_ring_candidate`
+are constant across the entire dataset and contribute nothing to any model — see
+`docs/model_card.md` for how I found that and what else I'd flag as a real limitation (a small
+amount of full-history leakage in the graph features, no hyperparameter tuning, one time split
+rather than walk-forward validation).
+
+This training run is a real Airflow task (`train_supervised_models`, wired into
+`fraud_pattern_pipeline` right after the existing anomaly-detection step), not a notebook run in
+isolation — it writes every model's metrics to `fraud_pattern.model_evaluation`, test-set
+predictions to `anomaly_scores`, and feature importances to a new `feature_importance` table.
+`fraud_model_comparison.ipynb` is the same analysis end to end (EDA, features, training,
+evaluation, SHAP) for anyone who wants to see the reasoning and the code side by side, calling the
+exact same `pipeline.py` functions the DAG does rather than reimplementing any of it. Confusion
+matrices, ROC curves, and the SHAP plot are real images generated from this exact run, in
+`docs/evidence/`.
+
 ## Power BI
 
 The report has 2 pages and 16 real visual objects, built from a data model I modeled by hand — 3
@@ -80,6 +130,7 @@ DAX, and the color system are in `docs/powerbi_guide.md`.
 ## Docs
 
 `docs/methodology.md` covers fraud-ring generation and the threshold tradeoff in more depth;
+`docs/model_card.md` covers the supervised models (features, real limitations, intended use);
 `docs/powerbi_guide.md` has the report build notes; `docs/database_schema.md` and
 `docs/data_sources.md` cover the data model and sourcing.
 

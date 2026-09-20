@@ -16,6 +16,11 @@ data_raw/*
 *.egg-info/
 .pytest_cache/
 
+# Local-only H2O AutoML model artifacts (binary, machine-specific) saved by
+# the optional AutoML sanity-check cells in fraud_model_comparison.ipynb --
+# never committed, same as the rest of the H2O work.
+h2o_saved_models/
+
 # Power BI: .pbip projects (TMDL/PBIR) are text and committed; these are
 # per-machine local cache/credential artifacts Power BI Desktop generates
 # next to them and must never be committed.

@@ -1,0 +1,6 @@
+# Extra dependencies for the optional AutoML sanity-check cells at the end
+# of fraud_model_comparison.ipynb only -- NOT installed in the Airflow
+# container or the dashboard image, and not required to run the DAG or the
+# rest of the notebook. Needs a local JVM (H2O starts its own local Java
+# process); see the README's "Running it" section.
+h2o==3.46.0.12
