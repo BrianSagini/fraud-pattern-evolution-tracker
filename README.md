@@ -35,8 +35,10 @@ docker compose exec airflow-scheduler airflow dags trigger fraud_pattern_pipelin
 ```
 
 The DAG takes 15-20 minutes end to end (generation → graph analytics → model training →
-evaluation). Dashboard's at http://localhost:8504 once it's done. `docker compose down` shuts
-everything down without losing data.
+evaluation). Live public dashboard: https://fraud-pattern-evolution.streamlit.app/ (reads from a
+shared cloud database, not this local stack). Your own local run's dashboard is at
+http://localhost:8504 once it's done. `docker compose down` shuts everything down without losing
+data.
 
 The AutoML sanity-check cells at the end of `fraud_model_comparison.ipynb` are optional and
 local-only — they're not part of the Airflow DAG or the container image. Running them needs
